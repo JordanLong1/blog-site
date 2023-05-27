@@ -20,11 +20,13 @@ model User {
 model Password {
   password String
   id       Int    @id @default(autoincrement()) // fix later
-  // User     User[]
+  userId   Int
+  // User     User@relation(fields: [userId], references: [id])
 }
 
 model Blog {
   id     Int    @id @default(autoincrement())
   title  String
+  // content 
   userId Int
 }
