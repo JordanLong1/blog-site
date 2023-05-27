@@ -4,7 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 export async function loader() {
   const prisma = new PrismaClient()
   const allUsers = prisma.user.findMany();
-  console.log('all users', allUsers)
+
   await prisma.$disconnect();
   return allUsers
 }
