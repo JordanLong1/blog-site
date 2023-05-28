@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { db } from './db.server';
 import bcrypt from 'bcrypt'
 
 
@@ -8,8 +8,7 @@ type LoginType = {
 }
 
 export async function login({username, password}: LoginType) {
-    const prisma = await new PrismaClient();
-    const existingUser = await prisma.user.findFirst({where: {username}});
+    const existingUser = await db.user.findFirst({where: {username}});
     if (!existingUser) {
         return null;
     }
