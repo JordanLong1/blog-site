@@ -1,86 +1,73 @@
 import type {
     ActionArgs,
-    LinksFunction,
   } from "@remix-run/node";
   import {
-    Link,
     useActionData,
-    useSearchParams,
   } from "@remix-run/react";
+
   
-  import stylesUrl from "~/styles/login.css";
+//   import stylesUrl from "~/styles/login.css";
   import { db } from "~/utils/db.server";
   
-  export const links: LinksFunction = () => [
-    { rel: "stylesheet", href: stylesUrl },
-  ];
+//   function validateUsername(username: string) {
+//     if (username.length < 6) {
+//       return "Usernames must be at least 3 characters long";
+//     }
+//   }
   
-  function validateUsername(username: string) {
-    if (username.length < 6) {
-      return "Usernames must be at least 3 characters long";
-    }
-  }
-  
-  function validatePassword(password: string) {
-    if (password.length < 6) {
-      return "Passwords must be at least 6 characters long";
-    }
-  }
-  
-  function validateUrl(url: string) {
-    const urls = ["/jokes", "/", "https://remix.run"];
-    if (urls.includes(url)) {
-      return url;
-    }
-    return "/jokes";
-  }
+//   function validatePassword(password: string) {
+//     if (password.length < 6) {
+//       return "Passwords must be at least 6 characters long";
+//     }
+//   }
   
   export const action = async ({ request }: ActionArgs) => {
+    console.log('HERE', request)
     const form = await request.formData();
+    console.log('FORM', form)
     const loginType = form.get("loginType");
     const password = form.get("password");
     const username = form.get("username");
-    const redirectTo = validateUrl(
-      (form.get("redirectTo") as string) || "/jokes"
-    );
-    if (
-      typeof loginType !== "string" ||
-      typeof password !== "string" ||
-      typeof username !== "string"
-    ) {
-        return { formError: `Form not submitted correctly.` };
-    }
+
+    // if (
+    //   typeof loginType !== "string" ||
+    //   typeof password !== "string" ||
+    //   typeof username !== "string"
+    // ) {
+    //     return { formError: `Form not submitted correctly.` };
+    // }
   
     const fields = { loginType, password, username };
-    const fieldErrors = {
-      password: validatePassword(password),
-      username: validateUsername(username),
-    };
-    if (Object.values(fieldErrors).some(Boolean)) {
-        return { formError: `Form not submitted correctly.` };
-    }
+    // const fieldErrors = {
+    //   password: validatePassword(password),
+    //   username: validateUsername(username),
+    // };
+    // if (Object.values(fieldErrors).some(Boolean)) {
+    //     return { formError: `Form not submitted correctly.` };
+    // }
   
     switch (loginType) {
       case "login": {
-        let user = await Login({username, password})
+        let user = await Login({username, password});
+        console.log('USER', user);
         if (!user) return {
-            return: { formError: `Form not submitted correctly.` };
+            return: { formError: `Form not submitted correctly.` }
         }
         // login to get the user
         // if there's no user, return the fields and a formError
         // if there is a user, create their session and redirect to /jokes
       }
-      case "register": {
-        const userExists = await db.user.findFirst({
-          where: { username },
-        });
-        if (userExists) {
-            return { formError: `Form not submitted correctly.` };
-        }
-        // create the user
-        // create their session and redirect to /jokes
-        return { formError: `Form not submitted correctly.` };
-      }
+    //   case "register": {
+    //     const userExists = await db.user.findFirst({
+    //       where: { username },
+    //     });
+    //     if (userExists) {
+    //         return { formError: `Form not submitted correctly.` };
+    //     }
+    //     // create the user
+    //     // create their session and redirect to /jokes
+    //     return { formError: `Form not submitted correctly.` };
+    //   }
       default: {
         return { formError: `Form not submitted correctly.` };
       }
@@ -89,48 +76,14 @@ import type {
   
   export default function Login() {
     const actionData = useActionData<typeof action>();
-    const [searchParams] = useSearchParams();
+    const test = useActionData()
+    console.log('test', test)
+    // console.log('ACTION DATA', actionData)
     return (
       <div className="container">
         <div className="content" data-light="">
           <h1>Login</h1>
           <form method="post">
-            <input
-              type="hidden"
-              name="redirectTo"
-              value={
-                searchParams.get("redirectTo") ?? undefined
-              }
-            />
-            <fieldset>
-              <legend className="sr-only">
-                Login or Register?
-              </legend>
-              <label>
-                <input
-                  type="radio"
-                  name="loginType"
-                  value="login"
-                  defaultChecked={
-                    !actionData?.fields?.loginType ||
-                    actionData?.fields?.loginType === "login"
-                  }
-                />{" "}
-                Login
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="loginType"
-                  value="register"
-                  defaultChecked={
-                    actionData?.fields?.loginType ===
-                    "register"
-                  }
-                />{" "}
-                Register
-              </label>
-            </fieldset>
             <div>
               <label htmlFor="username-input">Username</label>
               <input
@@ -197,16 +150,6 @@ import type {
               Submit
             </button>
           </form>
-        </div>
-        <div className="links">
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/jokes">Jokes</Link>
-            </li>
-          </ul>
         </div>
       </div>
     );
